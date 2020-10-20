@@ -241,6 +241,98 @@ activity multi fragment* dengan menggunakan *navigation component*.
 - Adaptasi logika untuk `AWAY_REQUEST_KEY` berdasarkan logika dari
  `HOME_REQUEST_KEY`
 
+- Buka layout `fragment_goal.xml`, dan tambahkan deklarasi databinding sesuai
+ dengan inputan untuk nama pemain dan menit yang dimodelkan dengan `GoalScorer`.
+ Selain itu tambahkan definisi variabel `fragment` untuk menghubungkan Fragment
+ dan layout.
+
+  ```xml title="fragment_goal.xml" {9-14}
+  <?xml version="1.0" encoding="utf-8"?>
+  <layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+      <variable
+        name="fragment"
+        type="id.ac.polinema.skor.fragments.GoalFragment" />
+      <variable
+        name="goalScorer"
+        type="id.ac.polinema.skor.models.GoalScorer" />
+    </data>
+
+  </layout>
+  ```
+
+- Tambahkan ekspresi databinding pada event tombol **Save** dan **Cancel**.
+
+  ```java title="fragment_goal.xml" {8,22}
+		<Button
+			android:id="@+id/button_save"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="8dp"
+			android:layout_marginEnd="8dp"
+			android:layout_marginBottom="8dp"
+			android:onClick="@{(v) -> fragment.onSaveClicked(v)}"
+			android:text="Save"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="@+id/guideline3" />
+
+		<Button
+			android:id="@+id/button_cancel"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="8dp"
+			android:layout_marginEnd="8dp"
+			android:layout_marginBottom="8dp"
+			android:text="Cancel"
+			android:onClick="@{(v) -> fragment.onCancelClicked(v)}"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toStartOf="@+id/guideline3"
+			app:layout_constraintStart_toStartOf="parent" />
+  ```
+
+- Buka file `GoalFragment.java` untuk mengatur databinding antara layout dan
+ logika. Tambahkan logika berikut pada method `onCreateView()`.
+
+  ```java title="GoalFragment.java" {4-8}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		FragmentGoalBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_goal, container, false);
+		binding.setFragment(this);
+		binding.setGoalScorer(goalScorer);
+		requestKey = GoalFragmentArgs.fromBundle(getArguments()).getRequestKey();
+		return binding.getRoot();
+	}
+  ```
+
+- Tambahkan logika berikut untuk mengirimkan data pencetak gol ke `ScoreFragment`
+  melalui `setFragmentResult()`. Untuk kembali ke Fragment pemanggil, dapat
+  digunakan method `navigateUp()`.
+
+  ```java title="GoalFragment.java"
+	public void onSaveClicked(View view) {
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(ScoreFragment.SCORER_KEY, goalScorer);
+		getParentFragmentManager().setFragmentResult(requestKey, bundle);
+		Navigation.findNavController(view).navigateUp();
+	}
+  ```
+
+- Tambahkan logika untuk menangani aksi **Cancel** dengan menggunakan
+ `navigateUp()` tanpa mengirimkan data ke Fragment pemanggil.
+
+  ```java title="GoalFragment.java"
+	public void onCancelClicked(View view) {
+		Navigation.findNavController(view).navigateUp();
+	}
+  ```
+
 ## Tantangan
 
 Tampilkan data pemain beserta menit gol terjadi untuk masing-masing tim pada id
