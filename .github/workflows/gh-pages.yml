@@ -1,35 +1,63 @@
-name: GitHub pages
+name: documentation
 
 on:
+  pull_request:
+    branches: [documentation]
   push:
-    branches:
-      - master
-
-env:
-  NODE_VERSION: '14.x'
+    branches: [documentation]
 
 jobs:
-  build-deploy:
+  checks:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
         with:
-          ref: master
-          fetch-depth: 1
-
-      - name: Use Node.JS ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Build GitHub Pages
+          node-version: '12.x'
+      - name: Test Build
         run: |
-          npm install && npm run build
-      - name: Deploy GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+          if [ -e yarn.lock ]; then
+          yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+          npm ci
+          else
+          npm i
+          fi
+          npm run build
+  gh-release:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
         with:
-          personal_token: ${{ secrets.PERSONAL_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./build
-          force_orphan: true
-
+          node-version: '12.x'
+      - name: Add key to allow access to repository
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          echo "${{ secrets.GH_PAGES_DEPLOY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          cat <<EOT >> ~/.ssh/config
+          Host github.com
+          HostName github.com
+          IdentityFile ~/.ssh/id_rsa
+          EOT
+      - name: Release to GitHub Pages
+        env:
+          USE_SSH: true
+          GIT_USER: git
+        run: |
+          git config --global user.email "actions@gihub.com"
+          git config --global user.name "gh-actions"
+          if [ -e yarn.lock ]; then
+          yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+          npm ci
+          else
+          npm i
+          fi
+          npx docusaurus deploy
