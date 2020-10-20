@@ -196,6 +196,51 @@ activity multi fragment* dengan menggunakan *navigation component*.
 	}
   ```
 
+- Pada Fragment `ScoreFragment` membutuhkan untuk menampung hasil data kembalian
+ dari Fragment `GoalFragment`. Untuk melakukan ini tambahkan dua buah listener
+ baik untuk tim **Home** dan tim **Away**.
+
+  ```java title="ScoreFragment.java" {9-14,16-21}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		FragmentScoreBinding binding = DataBindingUtil
+			.inflate(inflater, R.layout.fragment_score, container, false);
+		binding.setFragment(this);
+		binding.setHomeGoalScorerList(homeGoalScorerList);
+		binding.setAwayGoalScorerList(awayGoalScorerList);
+		getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+			}
+		});
+
+		getParentFragmentManager().setFragmentResultListener(AWAY_REQUEST_KEY, this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+			}
+		});
+		return binding.getRoot();
+	}
+  ```
+
+- Pada listener untuk `HOME_REQUEST_KEY` tambahkan logika untuk menambahkan data
+ yang dikirimkan dari Fragment `GoalFragment`.
+
+  ```java title="ScoreFragment.java" {3-4}
+  getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new FragmentResultListener() {
+    @Override
+    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+      GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
+      homeGoalScorerList.add(goalScorer);
+    }
+  });
+  ```
+- Adaptasi logika untuk `AWAY_REQUEST_KEY` berdasarkan logika dari
+ `HOME_REQUEST_KEY`
+
 ## Tantangan
 
 Tampilkan data pemain beserta menit gol terjadi untuk masing-masing tim pada id
