@@ -45,7 +45,7 @@ activity multi fragment* dengan menggunakan *navigation component*.
  untuk menyimpan data skor untuk masing-masing tim. Pendekatan pada praktikum
  ini menggunakan databinding.
 
-  ```xml
+  ```xml title="fragment_score.xml"
   <?xml version="1.0" encoding="utf-8"?>
   <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -70,6 +70,21 @@ activity multi fragment* dengan menggunakan *navigation component*.
     </androidx.constraintlayout.widget.ConstraintLayout>
   </layout>
   ```
+- Buka file `ScoreFragment.java`, hubungkan databinding layout dengan fragment
+ java dengan menambahkan kode berikut pada method `onCreateView()`
+
+  ```java title="ScoreFragment.java" {4-8}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+		FragmentScoreBinding binding = DataBindingUtil
+			.inflate(inflater, R.layout.fragment_score, container, false);
+		binding.setHomeGoalScorerList(homeGoalScorerList);
+		binding.setAwayGoalScorerList(awayGoalScorerList);
+		return binding.getRoot();
+	}
+  ```
+
 
 - Untuk menghitung skor tim, didapatkan dengan menghitung ukuran jumlah data
  pencetak gol dengan method `size()`. Ekspresi databinding yang dibutuhkan untuk
@@ -101,12 +116,28 @@ activity multi fragment* dengan menggunakan *navigation component*.
  dibutuhkan tambahan deklarasi variabel `fragment`. Tambahkan variabel pada
  bagian data dengan jenis `ScoreFragment`.
 
-  ```xml {3-4}
+  ```xml title="fragment_score.xml" {3-4}
 	<data>
 		<variable
 			name="fragment"
 			type="id.ac.polinema.skor.fragments.ScoreFragment" />
 	</data>
+  ```
+
+- Buka kembali file `ScoreFragment.java` dan tambahkan pengaturan databinding
+ untuk fragment. Silahkan perhatikan kode berikut.
+
+  ```java title="ScoreFragment.java" {8}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
+      FragmentScoreBinding binding = DataBindingUtil
+        .inflate(inflater, R.layout.fragment_score, container, false);
+      binding.setHomeGoalScorerList(homeGoalScorerList);
+      binding.setAwayGoalScorerList(awayGoalScorerList);
+      binding.setFragment(this);
+      return binding.getRoot();
+	}
   ```
 
 - Tambahkan event click pada id `button_add_home` dengan ekspresi databinding
@@ -170,9 +201,9 @@ activity multi fragment* dengan menggunakan *navigation component*.
 Tampilkan data pemain beserta menit gol terjadi untuk masing-masing tim pada id
 `text_home_scorer` dan `text_away_scorer`. Contoh tampilan yang diinginkan:
 
- <code>
-   Andi 5" Budi 10"
- </code>
+```
+Andi 5" Budi 10"
+```
 
 ## Bahan Bacaan
 
