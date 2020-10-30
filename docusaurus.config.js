@@ -1,6 +1,6 @@
 module.exports = {
   title: 'DosenHub',
-  tagline: 'The tagline of my site',
+  tagline: 'Learning Media System',
   url: 'https://dosenhub.github.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -42,7 +42,7 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
+              label: 'Daftar Perkuliahan',
               to: 'docs/',
             },
             {
