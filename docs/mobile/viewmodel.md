@@ -132,6 +132,14 @@ ViewModel).
 - Buka berkas `GoalFragment.java` dan lakukan instansiasi viewmodel pada method
  `onCreateView()` dengan cara yang sama.
 
+- Buka kembali berkas `ScoreFragment.java`, dalam project ini digunakan juga
+ databinding sehingga perlu proses untuk menghubungkan viewmodel. Tambahkan
+ proses binding viewmodel dengan kode berikut.
+
+  ```java title="ScoreFragment.java"
+  binding.setVm(viewModel);
+  ```
+
 - Kemudian untuk menambahkan interaksi penambahan pencetak gol, silahkan
  tambahkan kode berikut pada method `onSaveClicked()`
 
